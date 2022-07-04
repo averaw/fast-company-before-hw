@@ -11,12 +11,15 @@ import {
     removeComment
 } from "../../store/comments";
 import { useParams } from "react-router-dom";
+import { nanoid } from "nanoid";
+import { getCurrentUserId } from "../../store/users";
 
 const Comments = () => {
     const { userId } = useParams();
 
     const comments = useSelector(getComments());
     const dispatch = useDispatch();
+    const currentUserId = useSelector(getCurrentUserId());
 
     useEffect(() => {
         dispatch(loadCommentsList(userId));
@@ -24,8 +27,14 @@ const Comments = () => {
     const isLoading = useSelector(getCommentsLoadingStatus());
 
     const handleSubmit = (data) => {
-        console.log(data);
-        dispatch(createComment(data));
+        const comment = {
+            ...data,
+            pageId: userId,
+            created_at: Date.now(),
+            userId: currentUserId,
+            _id: nanoid()
+        };
+        dispatch(createComment(comment));
     };
     const handleRemoveComment = (id) => {
         dispatch(removeComment(id));
